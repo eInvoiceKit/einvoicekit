@@ -1,11 +1,11 @@
-# facturx
+# einvoicekit
 
 Check a Factur-X, ZUGFeRD, XRechnung, UBL or CII invoice against the full
 official EN 16931 rule set, from one command or one function call. No Java,
 no Saxon, no rule files to download.
 
 ```sh
-pipx run facturx invoice.pdf
+pipx run --spec einvoicekit facturx invoice.pdf
 ```
 
 ```
@@ -38,14 +38,15 @@ Two promises follow from that:
 ## Install
 
 ```sh
-pip install facturx
+pip install einvoicekit
 ```
 
 Python 3.10 or later. No dependencies.
 
-The import name is `einvoicekit`, not `facturx`: another distribution
-already installs a top-level `facturx` module, and two packages writing the
-same path would corrupt each other's install.
+Import `einvoicekit`, run `facturx`: the module carries the package's name,
+the command carries the format's. The package never installs a `facturx`
+module, because another distribution already owns that path and two packages
+writing the same path would corrupt each other's install.
 
 ## Use it from code
 

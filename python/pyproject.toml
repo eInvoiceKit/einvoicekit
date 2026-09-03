@@ -3,7 +3,7 @@ requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
 [project]
-name = "facturx"
+name = "einvoicekit"
 version = "0.1.0"
 description = "Check a Factur-X, ZUGFeRD, XRechnung, UBL or CII e-invoice against the full official EN 16931 rule set. One command, no key needed to start."
 readme = "README.md"
