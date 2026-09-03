@@ -99,10 +99,8 @@ lists every option.
 - **Pro**: 29 € a month for 1,000 pooled credits, a validation spending one.
   [Details](https://einvoicekit.com/pricing).
 
-On the free pool, only a delivered verdict counts: a document the API cannot
-assess, a refused call and an error on the service's side give the run back.
-With a key, the call is counted once it authenticates, so today an
-unreadable file or a service error still spends one credit.
+Only a delivered verdict counts. A document the API cannot assess, a refused
+call and an error on the service's side cost nothing.
 
 ## Errors
 
