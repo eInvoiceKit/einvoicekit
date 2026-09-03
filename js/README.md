@@ -1,11 +1,11 @@
-# facturx
+# @einvoicekit/facturx
 
 Check a Factur-X, ZUGFeRD, XRechnung, UBL or CII invoice against the full
 official EN 16931 rule set, from one command or one function call. No Java,
 no Saxon, no rule files to download.
 
 ```sh
-npx facturx invoice.pdf
+npx @einvoicekit/facturx invoice.pdf
 ```
 
 ```
@@ -38,7 +38,7 @@ Two promises follow from that:
 ## Install
 
 ```sh
-npm install facturx
+npm install @einvoicekit/facturx
 ```
 
 Node 20 or later. No dependencies.
@@ -76,11 +76,11 @@ Options:
 ## Use it from the command line
 
 ```sh
-npx facturx invoice.pdf
-npx facturx a.xml b.pdf --target france
-npx facturx invoice.pdf --json
-npx facturx invoice.pdf --warnings
-EINVOICEKIT_API_KEY=eik_live_... npx facturx invoice.pdf
+npx @einvoicekit/facturx invoice.pdf
+npx @einvoicekit/facturx a.xml b.pdf --target france
+npx @einvoicekit/facturx invoice.pdf --json
+npx @einvoicekit/facturx invoice.pdf --warnings
+EINVOICEKIT_API_KEY=eik_live_... npx @einvoicekit/facturx invoice.pdf
 ```
 
 `--json` prints the API's verdict as JSON on stdout, an array when several

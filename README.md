@@ -6,8 +6,8 @@ no Saxon, no rule files to download.
 
 Two packages, one behaviour:
 
-- **npm**: [`js/`](js/README.md), `npx facturx invoice.pdf`
-- **PyPI**: [`python/`](python/README.md), `pipx run facturx invoice.pdf`
+- **npm**: [`js/`](js/README.md), `npx @einvoicekit/facturx invoice.pdf`
+- **PyPI**: [`python/`](python/README.md), `pipx run --spec einvoicekit facturx invoice.pdf`
 
 Both are thin, honest clients for [einvoicekit](https://einvoicekit.com)'s
 validator: the invoice is sent over HTTPS, processed in memory to produce
