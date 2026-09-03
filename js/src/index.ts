@@ -5,7 +5,7 @@
  * so the emitted `index.d.ts` imports nothing and can be copied verbatim to
  * `index.d.cts` for the CommonJS consumers.
  */
-export const VERSION = '0.1.0';
+export const VERSION = '0.1.1';
 
 /** One failed or advisory rule, exactly as the API reports it. */
 export interface Finding {
