@@ -24,7 +24,7 @@
     "directory": "js"
   },
   "license": "MIT",
-  "author": "Vizalgo SASU",
+  "author": "Vizalgo SAS",
   "type": "module",
   "engines": {
     "node": ">=20"
