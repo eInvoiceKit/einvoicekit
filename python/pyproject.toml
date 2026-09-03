@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
-authors = [{ name = "Yassine Zaroui" }]
+authors = [{ name = "Vizalgo SASU" }]
 keywords = [
   "factur-x",
   "facturx",
@@ -44,8 +44,8 @@ dependencies = []
 
 [project.urls]
 Homepage = "https://einvoicekit.com/docs/"
-Repository = "https://github.com/yzaroui/facturx"
-Issues = "https://github.com/yzaroui/facturx/issues"
+Repository = "https://github.com/eInvoiceKit/facturx"
+Issues = "https://github.com/eInvoiceKit/facturx/issues"
 
 # The import name is `einvoicekit`, not `facturx`, on purpose: the `factur-x`
 # distribution already installs a top-level `facturx` package, and two

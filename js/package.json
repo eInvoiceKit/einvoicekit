@@ -17,14 +17,14 @@
     "validator"
   ],
   "homepage": "https://einvoicekit.com/docs/",
-  "bugs": "https://github.com/yzaroui/facturx/issues",
+  "bugs": "https://github.com/eInvoiceKit/facturx/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yzaroui/facturx.git",
+    "url": "git+https://github.com/eInvoiceKit/facturx.git",
     "directory": "js"
   },
   "license": "MIT",
-  "author": "Yassine Zaroui",
+  "author": "Vizalgo SASU",
   "type": "module",
   "engines": {
     "node": ">=20"
