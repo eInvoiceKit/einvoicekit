@@ -1,0 +1,6 @@
+node_modules/
+dist/
+# Copied in by `npm run prepack` from the repo root; the root files are the source.
+js/README.md
+js/LICENSE
+.DS_Store

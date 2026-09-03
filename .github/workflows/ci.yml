@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  js:
+    name: JavaScript package
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: js/package-lock.json
+      - run: npm ci
+      - run: npm run format
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+      # Both consumers get types: ESM from index.d.ts, CommonJS from index.d.cts.
+      - run: test -f dist/index.d.ts && test -f dist/index.d.cts && test -f dist/index.cjs
+      # The built command must run on the oldest Node the package claims.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+      - run: node dist/bin.js --version

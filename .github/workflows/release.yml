@@ -1,0 +1,47 @@
+name: Release
+
+# Publishes to npm from a GitHub release, through npm trusted publishing:
+# the workflow proves its identity to the registry with an OIDC token
+# (`id-token: write`), so no npm token is stored anywhere. npm generates
+# provenance automatically for a public repository. Requires npm CLI 11.5.1
+# or later, which is why the latest npm is installed first.
+#
+# The trusted publisher is configured on npmjs.com, package settings:
+# owner yzaroui, repository facturx, workflow release.yml, environment npm.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  npm:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    environment: npm
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm install -g npm@latest
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      # The tag is the single source of the version: refuse to publish a
+      # package.json that disagrees with it.
+      - run: |
+          tag="${GITHUB_REF_NAME#v}"
+          version="$(node -p "require('./package.json').version")"
+          if [ "$tag" != "$version" ]; then
+            echo "release tag v$tag does not match package.json version $version" >&2
+            exit 1
+          fi
+      - run: npm publish --access public

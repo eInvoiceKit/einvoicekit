@@ -1,0 +1,71 @@
+{
+  "name": "facturx",
+  "version": "0.1.0",
+  "description": "Check a Factur-X, ZUGFeRD, XRechnung, UBL or CII e-invoice against the full official EN 16931 rule set. One command, no key needed to start.",
+  "keywords": [
+    "factur-x",
+    "facturx",
+    "zugferd",
+    "xrechnung",
+    "en16931",
+    "e-invoice",
+    "einvoice",
+    "ubl",
+    "cii",
+    "peppol",
+    "validation",
+    "validator"
+  ],
+  "homepage": "https://einvoicekit.com/docs/",
+  "bugs": "https://github.com/yzaroui/facturx/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yzaroui/facturx.git",
+    "directory": "js"
+  },
+  "license": "MIT",
+  "author": "Yassine Zaroui",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "facturx": "./dist/bin.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup && npm run types",
+    "types": "tsc -p tsconfig.build.json && cp dist/index.d.ts dist/index.d.cts",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "format": "prettier --check .. --ignore-path ../.prettierignore",
+    "test": "vitest run",
+    "prepack": "cp ../README.md README.md && cp ../LICENSE LICENSE && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "prettier": "^3.9.6",
+    "tsup": "^8.5.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
+  }
+}
