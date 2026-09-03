@@ -47,7 +47,7 @@ Node 20 or later. No dependencies.
 
 ```js
 import { readFile } from 'node:fs/promises';
-import { validate, FacturxError } from 'facturx';
+import { validate, FacturxError } from '@einvoicekit/facturx';
 
 const result = await validate(await readFile('invoice.pdf'));
 
