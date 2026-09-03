@@ -59,7 +59,7 @@
     "check": "tsc -p tsconfig.json --noEmit",
     "format": "prettier --check .. --ignore-path ../.prettierignore",
     "test": "vitest run",
-    "prepack": "cp ../README.md README.md && cp ../LICENSE LICENSE && npm run build"
+    "prepack": "cp ../LICENSE LICENSE && npm run build"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",

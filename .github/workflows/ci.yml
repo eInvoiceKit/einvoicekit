@@ -34,3 +34,29 @@ jobs:
         with:
           node-version: 20
       - run: node dist/bin.js --version
+
+  python:
+    name: Python package
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # The oldest Python the package claims and the current one.
+        python-version: ['3.10', '3.13']
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install --upgrade pip
+      - run: pip install --group dev
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: pytest -q
+      - run: cp ../LICENSE LICENSE && python -m build
+      # The wheel installs, the import name is einvoicekit, the command is facturx.
+      - run: pip install dist/*.whl
+      - run: facturx --version
+      - run: python -c "import einvoicekit; print(einvoicekit.__version__)"

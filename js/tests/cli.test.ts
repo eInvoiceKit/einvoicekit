@@ -179,6 +179,26 @@ describe('main', () => {
     expect(seen).toHaveLength(1);
   });
 
+  test('a spent monthly quota: the upgrade door is printed, remaining files skipped, exit 2', async () => {
+    const { fetch, seen } = fakeFetch([
+      {
+        status: 429,
+        body: { error: 'monthly quota exceeded', upgrade: 'https://einvoicekit.com/pricing' },
+      },
+    ]);
+    const { cli, err } = io(
+      fetch,
+      { 'a.xml': '<a/>', 'b.xml': '<b/>' },
+      { EINVOICEKIT_API_KEY: 'eik_live_k' },
+    );
+    expect(await main(['a.xml', 'b.xml'], cli)).toBe(2);
+    expect(err).toEqual([
+      'a.xml  ERROR  quota_exceeded: monthly quota exceeded',
+      '  more allowance: https://einvoicekit.com/pricing',
+    ]);
+    expect(seen).toHaveLength(1);
+  });
+
   test('--json keeps one slot per file even when the pool stops the run early', async () => {
     const { fetch } = fakeFetch([
       { status: 200, body: VALID },

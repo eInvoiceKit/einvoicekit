@@ -1,0 +1,74 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "facturx"
+version = "0.1.0"
+description = "Check a Factur-X, ZUGFeRD, XRechnung, UBL or CII e-invoice against the full official EN 16931 rule set. One command, no key needed to start."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Yassine Zaroui" }]
+keywords = [
+  "factur-x",
+  "facturx",
+  "zugferd",
+  "xrechnung",
+  "en16931",
+  "e-invoice",
+  "einvoice",
+  "ubl",
+  "cii",
+  "peppol",
+  "validation",
+  "validator",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Office/Business :: Financial :: Accounting",
+  "Topic :: Software Development :: Libraries",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://einvoicekit.com/docs/"
+Repository = "https://github.com/yzaroui/facturx"
+Issues = "https://github.com/yzaroui/facturx/issues"
+
+# The import name is `einvoicekit`, not `facturx`, on purpose: the `factur-x`
+# distribution already installs a top-level `facturx` package, and two
+# distributions writing the same module path corrupt each other's install.
+[project.scripts]
+facturx = "einvoicekit.cli:run"
+
+[dependency-groups]
+dev = ["pytest >= 8", "ruff >= 0.12", "build >= 1.2"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/einvoicekit"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/einvoicekit", "tests", "README.md", "LICENSE", "pyproject.toml"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

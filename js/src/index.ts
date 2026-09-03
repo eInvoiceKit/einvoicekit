@@ -50,7 +50,7 @@ export type FacturxErrorCode =
   | 'rate_limited'
   /** 429 with a key: the account's monthly allowance is spent. `upgrade` is set. */
   | 'quota_exceeded'
-  /** 5xx: the service answered but could not validate. Nothing was charged. */
+  /** 5xx: the service answered but could not validate. */
   | 'service_unavailable'
   /** No response at all: DNS, TLS, timeout, abort. */
   | 'network';

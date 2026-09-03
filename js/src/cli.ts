@@ -185,16 +185,21 @@ export async function main(argv: string[], io: CliIo): Promise<number> {
       jsonOut.push(null);
       if (cause instanceof FacturxError) {
         io.stderr(`${file}  ERROR  ${cause.code}: ${cause.message}`);
-        if (cause.code === 'pool_exhausted' && !poolNoteShown) {
+        const wall = cause.code === 'pool_exhausted' || cause.code === 'quota_exceeded';
+        if (wall && !poolNoteShown) {
           poolNoteShown = true;
           if (cause.resetsAt)
             io.stderr(`  the free pool resets at ${formatInstant(cause.resetsAt)}`);
           if (cause.upgrade) {
-            io.stderr(`  a free key gives 100 validations a month, no card: ${cause.upgrade}`);
+            io.stderr(
+              cause.code === 'pool_exhausted'
+                ? `  a free key gives 100 validations a month, no card: ${cause.upgrade}`
+                : `  more allowance: ${cause.upgrade}`,
+            );
           }
         }
         // Every other file would hit the same wall; stop burning attempts.
-        if (cause.code === 'pool_exhausted' || cause.code === 'quota_exceeded') break;
+        if (wall) break;
       } else {
         const reason = cause instanceof Error ? cause.message : String(cause);
         io.stderr(`${file}  ERROR  ${reason}`);
