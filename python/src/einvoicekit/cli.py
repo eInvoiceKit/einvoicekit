@@ -147,7 +147,10 @@ def main(
         return 2
 
     fmt = format_instant or _default_format_instant
-    api_key = args.key if args.key is not None else env.get("EINVOICEKIT_API_KEY") or None
+    # An empty --key (a script passing an unset variable) is "no key", the
+    # same as the JS command: it must fall through to the pool, never send
+    # an empty bearer token that the API refuses as malformed.
+    api_key = args.key or env.get("EINVOICEKIT_API_KEY") or None
     any_invalid = False
     any_error = False
     pool_note_shown = False

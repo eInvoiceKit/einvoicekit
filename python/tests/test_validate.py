@@ -6,7 +6,6 @@ import urllib.request
 from pathlib import Path
 
 import pytest
-import tomllib
 
 from einvoicekit import (
     DEFAULT_BASE_URL,
@@ -230,6 +229,10 @@ def test_the_default_transport_turns_a_refusal_into_status_and_body(
 
 
 def test_version_is_the_one_pyproject_publishes():
-    pyproject = tomllib.loads((Path(__file__).parents[1] / "pyproject.toml").read_text())
-    assert __version__ == pyproject["project"]["version"]
+    # A regex rather than tomllib: that module only exists from 3.11, and the
+    # package claims 3.10.
+    pyproject = (Path(__file__).parents[1] / "pyproject.toml").read_text()
+    match = re.search(r'^version = "([^"]+)"$', pyproject, re.MULTILINE)
+    assert match is not None
+    assert __version__ == match.group(1)
     assert re.fullmatch(r"\d+\.\d+\.\d+", __version__)

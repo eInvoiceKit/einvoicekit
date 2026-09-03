@@ -147,6 +147,11 @@ def test_the_key_travels_from_flag_or_environment_and_target_reaches_the_url():
     Run({"a.xml": b"<a/>"}, {"EINVOICEKIT_API_KEY": ""})(["a.xml"], keyless)
     assert keyless.seen[0].get_header("Authorization") is None
 
+    # `--key "$UNSET_VAR"` is a real shape; it must not send an empty token.
+    empty_flag = Answers((200, VALID))
+    Run({"a.xml": b"<a/>"})(["a.xml", "--key", ""], empty_flag)
+    assert empty_flag.seen[0].get_header("Authorization") is None
+
 
 def test_base_url_points_the_call_elsewhere():
     answers = Answers((200, VALID))

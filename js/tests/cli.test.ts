@@ -144,6 +144,11 @@ describe('main', () => {
     const keyless = fakeFetch([{ status: 200, body: VALID }]);
     await main(['a.xml'], io(keyless.fetch, { 'a.xml': '<a/>' }).cli);
     expect(keyless.seen[0]?.headers['Authorization']).toBeUndefined();
+
+    // `--key "$UNSET_VAR"` is a real shape; it must not send an empty token.
+    const emptyFlag = fakeFetch([{ status: 200, body: VALID }]);
+    await main(['a.xml', '--key', ''], io(emptyFlag.fetch, { 'a.xml': '<a/>' }).cli);
+    expect(emptyFlag.seen[0]?.headers['Authorization']).toBeUndefined();
   });
 
   test('--base-url points the call elsewhere', async () => {
