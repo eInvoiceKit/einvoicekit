@@ -1,4 +1,4 @@
-"""The ``facturx`` command: files in, verdicts out, exit code 0 / 1 / 2."""
+"""The ``einvoicekit`` command: files in, verdicts out, exit code 0 / 1 / 2."""
 
 from __future__ import annotations
 
@@ -10,9 +10,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
-from . import FacturxError, Opener, ValidationResult, __version__, validate
+from . import EinvoicekitError, Opener, ValidationResult, __version__, validate
 
-USAGE = """Usage: facturx <file>... [options]
+USAGE = """Usage: einvoicekit <file>... [options]
 
 Checks each file (an XML invoice or a Factur-X / ZUGFeRD PDF) against the
 full official EN 16931 rule set and prints every broken rule.
@@ -133,7 +133,7 @@ def main(
     try:
         args = parse_args(argv)
     except ArgError as bad:
-        stderr(f"facturx: {bad}")
+        stderr(f"einvoicekit: {bad}")
         stderr(USAGE)
         return 2
     if args.help:
@@ -173,7 +173,7 @@ def main(
                 base_url=args.base_url,
                 opener=opener,
             )
-        except FacturxError as refused:
+        except EinvoicekitError as refused:
             any_error = True
             json_out.append(None)
             stderr(f"{file}  ERROR  {refused.code}: {refused}")

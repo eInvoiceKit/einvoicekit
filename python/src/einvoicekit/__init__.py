@@ -3,7 +3,7 @@
 A thin client for einvoicekit's ``POST /v1/validate``. The bytes are sent
 over HTTPS, processed in memory to produce the verdict and dropped. What
 comes back is the API's own JSON, field for field. If the service cannot be
-reached you get :class:`FacturxError`, never ``valid=True``.
+reached you get :class:`EinvoicekitError`, never ``valid=True``.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from typing import Any, Literal
 
 __all__ = [
     "DEFAULT_BASE_URL",
-    "FacturxError",
+    "EinvoicekitError",
     "Finding",
     "ValidationResult",
     "__version__",
@@ -26,9 +26,9 @@ __all__ = [
 ]
 
 # Written down once here and pinned to pyproject.toml by a test, so the
-# User-Agent the API logs (``facturx-py/<version>``) cannot drift from what
+# User-Agent the API logs (``einvoicekit-py/<version>``) cannot drift from what
 # PyPI publishes.
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 DEFAULT_BASE_URL = "https://api.einvoicekit.com"
 
@@ -93,7 +93,7 @@ class ValidationResult:
         )
 
 
-class FacturxError(Exception):
+class EinvoicekitError(Exception):
     """Raised for every outcome that is not a verdict.
 
     ``valid=False`` is never one of these: an invalid invoice is a result,
@@ -186,7 +186,7 @@ def validate(
     :param base_url: where the API lives; the escape hatch for proxies and tests.
     :param timeout: seconds to wait for the answer.
     :param opener: the transport, for tests.
-    :raises FacturxError: for everything that is not a verdict. No retries:
+    :raises EinvoicekitError: for everything that is not a verdict. No retries:
         a retry policy is yours, and a hidden one would burn the free pool
         silently.
     """
@@ -197,7 +197,7 @@ def validate(
 
     headers = {
         "Content-Type": "application/octet-stream",
-        "User-Agent": f"facturx-py/{__version__}",
+        "User-Agent": f"einvoicekit-py/{__version__}",
     }
     key = api_key if api_key is not None else _env_api_key()
     if key is not None:
@@ -209,7 +209,9 @@ def validate(
         status, body = send(request, timeout)
     except Exception as cause:  # noqa: BLE001 - every transport failure is one outcome
         host = urllib.request.urlparse(url).netloc
-        raise FacturxError(f"could not reach {host}: {cause}", code="network", status=0) from cause
+        raise EinvoicekitError(
+            f"could not reach {host}: {cause}", code="network", status=0
+        ) from cause
 
     if 200 <= status < 300:
         return ValidationResult.from_json(json.loads(body))
@@ -225,7 +227,7 @@ def validate(
         or refusal.get("error")
         or f"{host} answered {status} with no explanation"
     )
-    raise FacturxError(
+    raise EinvoicekitError(
         str(message),
         code=_code_for(status, refusal),
         status=status,

@@ -1,11 +1,11 @@
 /**
  * The package version, written down once here and pinned to package.json by
- * a test, so the User-Agent the API logs (`facturx-js/<version>`) cannot
+ * a test, so the User-Agent the API logs (`einvoicekit-js/<version>`) cannot
  * drift from what npm publishes. It lives in this file rather than its own
  * so the emitted `index.d.ts` imports nothing and can be copied verbatim to
  * `index.d.cts` for the CommonJS consumers.
  */
-export const VERSION = '0.1.1';
+export const VERSION = '0.2.0';
 
 /** One failed or advisory rule, exactly as the API reports it. */
 export interface Finding {
@@ -35,7 +35,7 @@ export interface ValidationResult {
  * Why a call produced no verdict. `valid: false` is never one of these: an
  * invalid invoice is a result, not an error.
  */
-export type FacturxErrorCode =
+export type EinvoicekitErrorCode =
   /** 400: the request itself was wrong (bad target, missing multipart field, empty body). */
   | 'bad_request'
   /** 401: an Authorization header was sent and the key is unknown, malformed or disabled. */
@@ -55,8 +55,8 @@ export type FacturxErrorCode =
   /** No response at all: DNS, TLS, timeout, abort. */
   | 'network';
 
-export interface FacturxErrorDetails {
-  code: FacturxErrorCode;
+export interface EinvoicekitErrorDetails {
+  code: EinvoicekitErrorCode;
   /** HTTP status of the refusal, or 0 when no response arrived. */
   status: number;
   /** ISO 8601 instant at which the free pool resets (pool_exhausted only). */
@@ -70,15 +70,15 @@ export interface FacturxErrorDetails {
  * a green verdict it did not compute: when it cannot be reached, you get
  * this error, not `valid: true`.
  */
-export class FacturxError extends Error {
-  readonly code: FacturxErrorCode;
+export class EinvoicekitError extends Error {
+  readonly code: EinvoicekitErrorCode;
   readonly status: number;
   readonly resetsAt: string | undefined;
   readonly upgrade: string | undefined;
 
-  constructor(message: string, details: FacturxErrorDetails) {
+  constructor(message: string, details: EinvoicekitErrorDetails) {
     super(message);
-    this.name = 'FacturxError';
+    this.name = 'EinvoicekitError';
     this.code = details.code;
     this.status = details.status;
     this.resetsAt = details.resetsAt;
@@ -140,7 +140,7 @@ async function readRefusal(response: Response): Promise<RefusalBody> {
   }
 }
 
-function codeFor(status: number, body: RefusalBody): FacturxErrorCode {
+function codeFor(status: number, body: RefusalBody): EinvoicekitErrorCode {
   if (status === 400) return 'bad_request';
   if (status === 401) return 'unauthorized';
   if (status === 413) return 'too_large';
@@ -164,7 +164,7 @@ function codeFor(status: number, body: RefusalBody): FacturxErrorCode {
  * validated; the PDF container's own PDF/A conformance is not checked.
  *
  * Resolves with the verdict, `valid` true or false. Rejects with a
- * `FacturxError` for everything else: a document the API cannot assess, a
+ * `EinvoicekitError` for everything else: a document the API cannot assess, a
  * spent allowance, a refused key, or a service that could not be reached.
  * No retries: a retry policy is yours, and a hidden one would burn the free
  * pool silently.
@@ -180,16 +180,19 @@ export async function validate(
   const apiKey = options.apiKey ?? envApiKey();
   const headers: Record<string, string> = {
     'Content-Type': 'application/octet-stream',
-    'User-Agent': `facturx-js/${VERSION}`,
+    'User-Agent': `einvoicekit-js/${VERSION}`,
   };
   if (apiKey !== undefined) headers['Authorization'] = `Bearer ${apiKey}`;
 
   const doFetch = options.fetch ?? globalThis.fetch;
   if (typeof doFetch !== 'function') {
-    throw new FacturxError('no fetch available: pass options.fetch or run on Node 20 or later', {
-      code: 'network',
-      status: 0,
-    });
+    throw new EinvoicekitError(
+      'no fetch available: pass options.fetch or run on Node 20 or later',
+      {
+        code: 'network',
+        status: 0,
+      },
+    );
   }
 
   let response: Response;
@@ -202,7 +205,7 @@ export async function validate(
     });
   } catch (cause) {
     const reason = cause instanceof Error ? cause.message : String(cause);
-    throw new FacturxError(`could not reach ${url.host}: ${reason}`, {
+    throw new EinvoicekitError(`could not reach ${url.host}: ${reason}`, {
       code: 'network',
       status: 0,
     });
@@ -216,7 +219,7 @@ export async function validate(
   const code = codeFor(response.status, body);
   const text =
     body.message ?? body.error ?? `${url.host} answered ${response.status} with no explanation`;
-  throw new FacturxError(text, {
+  throw new EinvoicekitError(text, {
     code,
     status: response.status,
     ...(body.resetsAt !== undefined ? { resetsAt: body.resetsAt } : {}),

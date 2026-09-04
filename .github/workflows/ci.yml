@@ -34,6 +34,9 @@ jobs:
         with:
           node-version: 20
       - run: node dist/bin.js --version
+      # The packed tarball installs and exposes the command under the package's
+      # bin name, the thing `npx @einvoicekit/einvoicekit` resolves.
+      - run: npm pack && npm install -g ./einvoicekit-einvoicekit-*.tgz && einvoicekit --version
 
   python:
     name: Python package
@@ -56,7 +59,7 @@ jobs:
       - run: ruff format --check .
       - run: pytest -q
       - run: cp ../LICENSE LICENSE && python -m build
-      # The wheel installs, the import name is einvoicekit, the command is facturx.
+      # The wheel installs, the import name is einvoicekit, the command is einvoicekit.
       - run: pip install dist/*.whl
-      - run: facturx --version
+      - run: einvoicekit --version
       - run: python -c "import einvoicekit; print(einvoicekit.__version__)"

@@ -1,13 +1,13 @@
-# facturx
+# einvoicekit
 
-Check a Factur-X, ZUGFeRD, XRechnung, UBL or CII invoice against the full
-official EN 16931 rule set, from one command or one function call. No Java,
-no Saxon, no rule files to download.
+Validate any EN 16931 e-invoice (Factur-X, ZUGFeRD, XRechnung, UBL or CII)
+against the full official rule set, from one command or one function call.
+No Java, no Saxon, no rule files to download.
 
 Two packages, one behaviour:
 
-- **npm**: [`js/`](js/README.md), `npx @einvoicekit/facturx invoice.pdf`
-- **PyPI**: [`python/`](python/README.md), `pipx run --spec einvoicekit facturx invoice.pdf`
+- **npm**: [`js/`](js/README.md), `npx @einvoicekit/einvoicekit invoice.pdf`
+- **PyPI**: [`python/`](python/README.md), `pipx run einvoicekit invoice.pdf`
 
 Both are thin, honest clients for [einvoicekit](https://einvoicekit.com)'s
 validator: the invoice is sent over HTTPS, processed in memory to produce

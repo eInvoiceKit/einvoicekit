@@ -235,4 +235,4 @@ def test_no_files_help_and_version():
 def test_a_bad_option_prints_the_reason_and_the_usage_exit_2():
     run = Run()
     assert run(["a.xml", "--target", "de"], Answers()) == 2
-    assert run.err == ["facturx: unknown target 'de'; supported: france", USAGE]
+    assert run.err == ["einvoicekit: unknown target 'de'; supported: france", USAGE]
