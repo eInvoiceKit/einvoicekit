@@ -1,4 +1,4 @@
-import { FacturxError, validate, VERSION, type ValidationResult } from './index.js';
+import { EinvoicekitError, validate, VERSION, type ValidationResult } from './index.js';
 
 /**
  * Everything the command touches in the outside world, injectable so the
@@ -14,7 +14,7 @@ export interface CliIo {
   formatInstant?: (iso: string) => string;
 }
 
-export const USAGE = `Usage: facturx <file>... [options]
+export const USAGE = `Usage: einvoicekit <file>... [options]
 
 Checks each file (an XML invoice or a Factur-X / ZUGFeRD PDF) against the
 full official EN 16931 rule set and prints every broken rule.
@@ -131,7 +131,7 @@ function defaultFormatInstant(iso: string): string {
 export async function main(argv: string[], io: CliIo): Promise<number> {
   const parsed = parseArgs(argv);
   if ('error' in parsed) {
-    io.stderr(`facturx: ${parsed.error}`);
+    io.stderr(`einvoicekit: ${parsed.error}`);
     io.stderr(USAGE);
     return 2;
   }
@@ -183,7 +183,7 @@ export async function main(argv: string[], io: CliIo): Promise<number> {
     } catch (cause) {
       anyError = true;
       jsonOut.push(null);
-      if (cause instanceof FacturxError) {
+      if (cause instanceof EinvoicekitError) {
         io.stderr(`${file}  ERROR  ${cause.code}: ${cause.message}`);
         const wall = cause.code === 'pool_exhausted' || cause.code === 'quota_exceeded';
         if (wall && !poolNoteShown) {

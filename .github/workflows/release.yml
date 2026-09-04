@@ -13,11 +13,11 @@ name: Release
 # Staging needs npm CLI 11.15.0 or later, hence the npm upgrade first.
 #
 # The trusted publisher is configured on npmjs.com, package settings:
-# owner eInvoiceKit, repository facturx, workflow release.yml, environment npm,
+# owner eInvoiceKit, repository einvoicekit, workflow release.yml, environment npm,
 # allowed action `npm stage publish`.
 #
 # PyPI works the same way through pypa/gh-action-pypi-publish: a "pending
-# publisher" on pypi.org (owner eInvoiceKit, repository facturx, workflow
+# publisher" on pypi.org (owner eInvoiceKit, repository einvoicekit, workflow
 # release.yml, environment pypi) creates the project on the first publish.
 # PyPI's own caveat: the name is not reserved until that first publish
 # succeeds.

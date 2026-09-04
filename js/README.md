@@ -1,11 +1,11 @@
-# @einvoicekit/facturx
+# @einvoicekit/einvoicekit
 
-Check a Factur-X, ZUGFeRD, XRechnung, UBL or CII invoice against the full
-official EN 16931 rule set, from one command or one function call. No Java,
-no Saxon, no rule files to download.
+Validate any EN 16931 e-invoice (Factur-X, ZUGFeRD, XRechnung, UBL or CII)
+against the full official rule set, from one command or one function call.
+No Java, no Saxon, no rule files to download.
 
 ```sh
-npx @einvoicekit/facturx invoice.pdf
+npx @einvoicekit/einvoicekit invoice.pdf
 ```
 
 ```
@@ -38,16 +38,19 @@ Two promises follow from that:
 ## Install
 
 ```sh
-npm install @einvoicekit/facturx
+npm install @einvoicekit/einvoicekit
 ```
 
 Node 20 or later. No dependencies.
+
+Renamed in 0.2.0: the package was `@einvoicekit/facturx`, the command
+`facturx` and the error class `FacturxError`. Nothing else changed.
 
 ## Use it from code
 
 ```js
 import { readFile } from 'node:fs/promises';
-import { validate, FacturxError } from '@einvoicekit/facturx';
+import { validate, EinvoicekitError } from '@einvoicekit/einvoicekit';
 
 const result = await validate(await readFile('invoice.pdf'));
 
@@ -76,11 +79,11 @@ Options:
 ## Use it from the command line
 
 ```sh
-npx @einvoicekit/facturx invoice.pdf
-npx @einvoicekit/facturx a.xml b.pdf --target france
-npx @einvoicekit/facturx invoice.pdf --json
-npx @einvoicekit/facturx invoice.pdf --warnings
-EINVOICEKIT_API_KEY=eik_live_... npx @einvoicekit/facturx invoice.pdf
+npx @einvoicekit/einvoicekit invoice.pdf
+npx @einvoicekit/einvoicekit a.xml b.pdf --target france
+npx @einvoicekit/einvoicekit invoice.pdf --json
+npx @einvoicekit/einvoicekit invoice.pdf --warnings
+EINVOICEKIT_API_KEY=eik_live_... npx @einvoicekit/einvoicekit invoice.pdf
 ```
 
 `--json` prints the API's verdict as JSON on stdout, an array when several
@@ -104,7 +107,7 @@ call and an error on the service's side cost nothing.
 
 ## Errors
 
-Everything that is not a verdict throws a `FacturxError` with a stable
+Everything that is not a verdict throws an `EinvoicekitError` with a stable
 `code`:
 
 | code                  | HTTP | meaning                                                                         |

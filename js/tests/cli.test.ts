@@ -263,6 +263,6 @@ describe('main', () => {
     const { fetch } = fakeFetch([]);
     const { cli, err } = io(fetch);
     expect(await main(['a.xml', '--target', 'de'], cli)).toBe(2);
-    expect(err).toEqual(["facturx: unknown target 'de'; supported: france", USAGE]);
+    expect(err).toEqual(["einvoicekit: unknown target 'de'; supported: france", USAGE]);
   });
 });

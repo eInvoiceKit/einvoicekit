@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import {
   DEFAULT_BASE_URL,
-  FacturxError,
+  EinvoicekitError,
   validate,
   VERSION,
   type ValidationResult,
@@ -55,7 +55,7 @@ describe('validate', () => {
     const init = calls[0]?.init as RequestInit & { headers: Record<string, string> };
     expect(init.method).toBe('POST');
     expect(init.headers['Content-Type']).toBe('application/octet-stream');
-    expect(init.headers['User-Agent']).toBe(`facturx-js/${VERSION}`);
+    expect(init.headers['User-Agent']).toBe(`einvoicekit-js/${VERSION}`);
     expect(init.body).toBeInstanceOf(Blob);
     expect(await (init.body as Blob).text()).toBe('<Invoice/>');
   });
@@ -155,15 +155,15 @@ describe('validate', () => {
       'service_unavailable',
       'api.einvoicekit.com answered 503 with no explanation',
     ],
-  ])('maps a %i refusal to a FacturxError', async (status, body, code, message) => {
+  ])('maps a %i refusal to an EinvoicekitError', async (status, body, code, message) => {
     const { fetch } = transport(status, body);
     const error = await validate(bytes, { fetch }).catch((e: unknown) => e);
-    expect(error).toBeInstanceOf(FacturxError);
-    const fx = error as FacturxError;
+    expect(error).toBeInstanceOf(EinvoicekitError);
+    const fx = error as EinvoicekitError;
     expect(fx.code).toBe(code);
     expect(fx.status).toBe(status);
     expect(fx.message).toBe(message);
-    expect(fx.name).toBe('FacturxError');
+    expect(fx.name).toBe('EinvoicekitError');
   });
 
   test('a spent pool carries resetsAt and upgrade', async () => {
@@ -174,7 +174,7 @@ describe('validate', () => {
       resetsAt: '2026-09-04T00:00:00.000Z',
       upgrade: 'https://einvoicekit.com/get-started?from=api-pool',
     });
-    const error = (await validate(bytes, { fetch }).catch((e: unknown) => e)) as FacturxError;
+    const error = (await validate(bytes, { fetch }).catch((e: unknown) => e)) as EinvoicekitError;
     expect(error.code).toBe('pool_exhausted');
     expect(error.resetsAt).toBe('2026-09-04T00:00:00.000Z');
     expect(error.upgrade).toBe('https://einvoicekit.com/get-started?from=api-pool');
@@ -186,7 +186,7 @@ describe('validate', () => {
       error: 'monthly quota exceeded',
       upgrade: 'https://einvoicekit.com/pricing',
     });
-    const error = (await validate(bytes, { fetch }).catch((e: unknown) => e)) as FacturxError;
+    const error = (await validate(bytes, { fetch }).catch((e: unknown) => e)) as EinvoicekitError;
     expect(error.code).toBe('quota_exceeded');
     expect(error.upgrade).toBe('https://einvoicekit.com/pricing');
     expect(error.resetsAt).toBeUndefined();
@@ -196,8 +196,8 @@ describe('validate', () => {
     const fetch = vi.fn(async () => {
       throw new TypeError('fetch failed');
     }) as unknown as typeof globalThis.fetch;
-    const error = (await validate(bytes, { fetch }).catch((e: unknown) => e)) as FacturxError;
-    expect(error).toBeInstanceOf(FacturxError);
+    const error = (await validate(bytes, { fetch }).catch((e: unknown) => e)) as EinvoicekitError;
+    expect(error).toBeInstanceOf(EinvoicekitError);
     expect(error.code).toBe('network');
     expect(error.status).toBe(0);
     expect(error.message).toBe('could not reach api.einvoicekit.com: fetch failed');

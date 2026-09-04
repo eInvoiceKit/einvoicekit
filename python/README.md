@@ -1,11 +1,11 @@
 # einvoicekit
 
-Check a Factur-X, ZUGFeRD, XRechnung, UBL or CII invoice against the full
-official EN 16931 rule set, from one command or one function call. No Java,
-no Saxon, no rule files to download.
+Validate any EN 16931 e-invoice (Factur-X, ZUGFeRD, XRechnung, UBL or CII)
+against the full official rule set, from one command or one function call.
+No Java, no Saxon, no rule files to download.
 
 ```sh
-pipx run --spec einvoicekit facturx invoice.pdf
+pipx run einvoicekit invoice.pdf
 ```
 
 ```
@@ -43,15 +43,13 @@ pip install einvoicekit
 
 Python 3.10 or later. No dependencies.
 
-Import `einvoicekit`, run `facturx`: the module carries the package's name,
-the command carries the format's. The package never installs a `facturx`
-module, because another distribution already owns that path and two packages
-writing the same path would corrupt each other's install.
+Renamed in 0.2.0: the command was `facturx` and the error class
+`FacturxError`. The package name and the import name are unchanged.
 
 ## Use it from code
 
 ```python
-from einvoicekit import validate, FacturxError
+from einvoicekit import validate, EinvoicekitError
 
 with open("invoice.pdf", "rb") as f:
     result = validate(f.read())
@@ -80,11 +78,11 @@ Keyword arguments:
 ## Use it from the command line
 
 ```sh
-facturx invoice.pdf
-facturx a.xml b.pdf --target france
-facturx invoice.pdf --json
-facturx invoice.pdf --warnings
-EINVOICEKIT_API_KEY=eik_live_... facturx invoice.pdf
+einvoicekit invoice.pdf
+einvoicekit a.xml b.pdf --target france
+einvoicekit invoice.pdf --json
+einvoicekit invoice.pdf --warnings
+EINVOICEKIT_API_KEY=eik_live_... einvoicekit invoice.pdf
 ```
 
 `--json` prints the API's verdict as JSON on stdout, an array when several
@@ -108,7 +106,7 @@ call and an error on the service's side cost nothing.
 
 ## Errors
 
-Everything that is not a verdict raises `FacturxError` with a stable `code`:
+Everything that is not a verdict raises `EinvoicekitError` with a stable `code`:
 
 | code                  | HTTP | meaning                                                                         |
 | --------------------- | ---- | ------------------------------------------------------------------------------- |

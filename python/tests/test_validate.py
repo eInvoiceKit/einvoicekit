@@ -9,7 +9,7 @@ import pytest
 
 from einvoicekit import (
     DEFAULT_BASE_URL,
-    FacturxError,
+    EinvoicekitError,
     Finding,
     ValidationResult,
     __version__,
@@ -80,7 +80,7 @@ def test_posts_the_bytes_and_returns_the_verdict_untouched(monkeypatch: pytest.M
     assert request.get_method() == "POST"
     assert request.data == BYTES
     assert request.get_header("Content-type") == "application/octet-stream"
-    assert request.get_header("User-agent") == f"facturx-py/{__version__}"
+    assert request.get_header("User-agent") == f"einvoicekit-py/{__version__}"
     assert request.get_header("Authorization") is None
     assert transport.timeouts == [30.0]
 
@@ -168,11 +168,11 @@ def test_invalid_is_a_return_never_a_raise(monkeypatch: pytest.MonkeyPatch):
         ),
     ],
 )
-def test_maps_a_refusal_to_a_facturx_error(
+def test_maps_a_refusal_to_an_einvoicekit_error(
     monkeypatch: pytest.MonkeyPatch, status: int, body: object, code: str, message: str
 ):
     monkeypatch.delenv("EINVOICEKIT_API_KEY", raising=False)
-    with pytest.raises(FacturxError) as raised:
+    with pytest.raises(EinvoicekitError) as raised:
         validate(BYTES, opener=Transport(status, body))
     assert raised.value.code == code
     assert raised.value.status == status
@@ -188,7 +188,7 @@ def test_a_spent_pool_carries_resets_at_and_upgrade(monkeypatch: pytest.MonkeyPa
         "resetsAt": "2026-09-04T00:00:00.000Z",
         "upgrade": "https://einvoicekit.com/get-started?from=api-pool",
     }
-    with pytest.raises(FacturxError) as raised:
+    with pytest.raises(EinvoicekitError) as raised:
         validate(BYTES, opener=Transport(429, body))
     assert raised.value.code == "pool_exhausted"
     assert raised.value.resets_at == "2026-09-04T00:00:00.000Z"
@@ -202,7 +202,7 @@ def test_no_response_at_all_is_a_network_error(monkeypatch: pytest.MonkeyPatch):
     def down(request: urllib.request.Request, timeout: float) -> tuple[int, bytes]:
         raise OSError("connection refused")
 
-    with pytest.raises(FacturxError) as raised:
+    with pytest.raises(EinvoicekitError) as raised:
         validate(BYTES, opener=down)
     assert raised.value.code == "network"
     assert raised.value.status == 0
