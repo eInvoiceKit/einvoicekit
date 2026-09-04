@@ -9,6 +9,30 @@ permissions:
   contents: read
 
 jobs:
+  # One release tag has to satisfy both publish jobs, so the two packages must
+  # always carry the same version. Checked here, on every pull request, rather
+  # than discovered by half a release: the npm job would publish and the PyPI
+  # job would fail the tag comparison, leaving the two registries apart.
+  version:
+    name: Both packages carry one version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.read.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: read
+        run: |
+          set -euo pipefail
+          js="$(node -p "require('./js/package.json').version")"
+          py="$(python3 -c "import tomllib; print(tomllib.load(open('python/pyproject.toml','rb'))['project']['version'])")"
+          if [ "$js" != "$py" ]; then
+            echo "js/package.json is $js but python/pyproject.toml is $py" >&2
+            echo "One release tag vX.Y.Z must match both; bump them together." >&2
+            exit 1
+          fi
+          echo "Both packages are $js"
+          echo "version=$js" >> "$GITHUB_OUTPUT"
+
   js:
     name: JavaScript package
     runs-on: ubuntu-latest
@@ -63,3 +87,83 @@ jobs:
       - run: pip install dist/*.whl
       - run: einvoicekit --version
       - run: python -c "import einvoicekit; print(einvoicekit.__version__)"
+
+  # ------------------------------------------------------------ the release --
+  # The draft release is the release button, exactly as in the website repo:
+  # nothing is published here. A green main leaves a draft named after the
+  # version both packages carry; publishing it by hand from the Releases page
+  # fires release.yml, which uploads to PyPI and stages the npm version for a
+  # 2FA approval.
+  #
+  # The draft is rewritten on every green push to main, so it always describes
+  # the newest commit. It is skipped when the version has already been
+  # released (its tag exists), because that says the packages were not bumped:
+  # bump both and push, and the draft appears.
+  draft-release:
+    name: Update the draft release
+    needs: [version, js, python]
+    # A pull request run exists to say whether the branch is green; it must
+    # never touch the release button.
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: v${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Full history and tags: the notes list every commit since the last
+          # release, and a tag is how "already released" is known.
+          fetch-depth: 0
+
+      - name: Draft the release for the version both packages carry
+        run: |
+          set -euo pipefail
+
+          # A tag exists only once a release has been published, so this reads
+          # as "this version already shipped".
+          if git rev-parse -q --verify "refs/tags/$VERSION" >/dev/null 2>&1; then
+            echo "$VERSION is already released. Bump both packages to draft the next one." >&2
+            exit 0
+          fi
+
+          prev="$(git tag --list 'v*' --sort=-creatordate | head -n 1)"
+          if [ -n "$prev" ]; then
+            range="$prev..HEAD"
+            heading="Commits since $prev"
+          else
+            range="HEAD"
+            heading="Commits"
+          fi
+
+          {
+            echo "## $VERSION"
+            echo ""
+            echo "### $heading"
+            echo ""
+            # The backticks are markdown, not a shell expansion.
+            # shellcheck disable=SC2016
+            git log --no-merges --max-count=200 --format='- %s (`%h`)' "$range"
+            echo ""
+            echo "Publishing this release uploads \`$VERSION\` to PyPI and stages it on npm."
+            echo "The npm version goes live only after a maintainer approves it with 2FA"
+            echo "(npmjs.com, Staged Packages, Approve). A version npm or PyPI already"
+            echo "serves is skipped rather than failing the run."
+          } > notes.md
+
+          # Whether a draft for this version exists already. Asked through
+          # `gh release list --json`, not `gh release view`: a draft carries no
+          # git tag, and the listing is the surface that certainly reports one.
+          existing="$(gh release list --limit 100 --json tagName,isDraft \
+            -q ".[] | select(.tagName == \"$VERSION\") | .tagName")"
+
+          if [ -n "$existing" ]; then
+            gh release edit "$VERSION" --target "$GITHUB_SHA" --notes-file notes.md
+            echo "Updated the draft $VERSION"
+          else
+            gh release create "$VERSION" --draft --title "$VERSION" \
+              --target "$GITHUB_SHA" --notes-file notes.md
+            echo "Drafted $VERSION"
+          fi

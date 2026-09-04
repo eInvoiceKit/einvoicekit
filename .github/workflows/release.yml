@@ -56,9 +56,13 @@ jobs:
             exit 1
           fi
       - run: cp ../LICENSE LICENSE && python -m build
+      # `skip-existing` is the action's own switch for the same situation as
+      # the npm job's check above: a version PyPI already holds is left alone
+      # instead of failing the release. PyPI never overwrites a version either.
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: python/dist
+          skip-existing: true
 
   npm:
     name: Publish to npm
@@ -86,4 +90,26 @@ jobs:
             echo "release tag v$tag does not match package.json version $version" >&2
             exit 1
           fi
-      - run: npm stage publish --access public
+      # A version npm already serves cannot be published again, and that is
+      # not a failure worth a red release: the first publish of a NEW package
+      # name has to be manual (npm attaches a trusted publisher only to a
+      # package that already exists), so the release that carries that same
+      # version finds its work already done. Skipping keeps the release green
+      # and still refuses silently to do nothing when the version is new.
+      #
+      # `npm view <pkg>@<version> version` prints the version when it exists
+      # and exits non-zero (E404) when it does not, so the exit code alone is
+      # the answer. It reads the public registry, which lags a publish by a
+      # few minutes; a false "new" here just reproduces today's error instead
+      # of hiding it, which is the safe direction.
+      - name: Stage the version on npm unless it is already published
+        run: |
+          set -uo pipefail
+          name="$(node -p "require('./package.json').name")"
+          version="$(node -p "require('./package.json').version")"
+          if npm view "$name@$version" version >/dev/null 2>&1; then
+            echo "$name@$version is already on npm; nothing to stage." >&2
+            echo "Published by hand, most likely: a new package name has to be." >&2
+            exit 0
+          fi
+          npm stage publish --access public
