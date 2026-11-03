@@ -155,8 +155,8 @@ function codeFor(status: number, body: RefusalBody): EinvoicekitErrorCode {
 
 /**
  * Validates one invoice against the full official EN 16931 rule set
- * (EN 16931, XRechnung 3.0.2, Factur-X 1.09, Peppol BIS 3.0) and, with
- * `target: 'france'`, the BR-FR rules.
+ * (EN 16931, XRechnung 3.0.2, Factur-X 1.09, Peppol BIS Billing 3.0.21)
+ * and, with `target: 'france'`, the BR-FR rules.
  *
  * The bytes are sent over HTTPS to einvoicekit's validator, processed in
  * memory to produce the verdict and dropped. What comes back is the API's
