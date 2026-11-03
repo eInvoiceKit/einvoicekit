@@ -24,8 +24,8 @@ It is a thin client. Each call sends the invoice over HTTPS to
 [einvoicekit](https://einvoicekit.com)'s validator, which processes it in
 memory to produce the verdict and drops it; nothing is stored. What you get
 in exchange is the real thing: the official rule sets, EN 16931, XRechnung
-3.0.2, Factur-X 1.09 and Peppol BIS 3.0, run by the reference validator, not
-a hand-written subset of them.
+3.0.2, Factur-X 1.09 and Peppol BIS Billing 3.0.21: the official rule files,
+run as published, not a hand-written subset of them.
 
 Two promises follow from that:
 
